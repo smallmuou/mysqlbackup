@@ -7,7 +7,7 @@ USAGE: mysqlbackup [OPTIONS] target_dir [keep_count]
 
 DESCRIPTION:
 
-mysqlbackup -  the MySQL command-line backup tool
+mysqlbackup -  the MySQL backup tool
 
 target_dir is the directory that backup data location. keep_count is the number copies keep, the minimum is 1, default is 3.
 
@@ -36,3 +36,12 @@ Backup 192.168.1.100 mysql to /srv/backups, and keep latest 3 copies.
 ```bash
 mysqlbackup -h 192.168.1.100 -P 3306 -u root -p test /srv/backups 3
 ```
+
+## AUTOMATIC
+
+You also can use cron to backup automitic like follow:
+
+```bash
+0 2 * * * /usr/local/bin/mysqlbackup -h 192.168.1.100 -P 3306 -u root -p test /srv/backups 3 
+```
+NOTE: cron environment variable PATH not include /usr/local/bin, you need type full path of mysqlbackup
