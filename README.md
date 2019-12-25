@@ -45,6 +45,6 @@ mysqlbackup -h 192.168.1.100 -P 3306 -u root -p test -c 3 /srv/backups
 You also can use cron to backup automitic like follow:
 
 ```bash
-0 2 * * * /usr/local/bin/mysqlbackup -h 192.168.1.100 -P 3306 -u root -p test  -c 3 /srv/backups
+0 2 * * * /usr/local/bin/mysqlbackup -u root -p test -c 3 /srv/backups
 ```
 NOTE: cron environment variable PATH not include /usr/local/bin, you need type full path of mysqlbackup
