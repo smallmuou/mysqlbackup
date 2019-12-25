@@ -94,24 +94,25 @@ prog=`basename $0`
 cat << EOF
 $prog version $VERSION by $AUTHOR
 
-USAGE: $prog [OPTIONS] target_dir [keep_count]
+USAGE: $prog [OPTIONS] target_dir [database, database ...]
 
 DESCRIPTION:
 
 mysqlbackup -  the MySQL backup tool
 
-target_dir is the directory that backup data location. keep_count is the number copies to keep, the minimum is 1, default is 3.
+target_dir    the directory that backup data location
+database      the database that need backup, if not assign, backup all database exclude 'mysql', 'information_schema', 'performance_schema'
 
 OPTIONS:
     -h  host name, default is localhost.
     -u  user,  default is root.
     -p  password, default is empty.
     -P  port, default is 3306.
+    -c  the count of latest copies to keep,  the minimum is 1, default is 3.
 
 EXAMPLES:
-    $prog -u root -p test /srv/backups 3
-    $prog -h 192.168.1.100 -P 3306 -u root -p test /srv/backups 3    
-
+    $prog -u root -p test /srv/backups mydb
+    $prog -h 192.168.1.100 -P 3306 -u root -p test -c 3 /srv/backups
 EOF
 exit 1
 }
@@ -120,10 +121,10 @@ host="localhost"
 port=3306
 user="root"
 password=""
-target_dir='.'
+target_dir=''
 keep_count=3
 
-while getopts 'h:u:p:P:' arg; do
+while getopts 'h:u:p:P:c:' arg; do
     case $arg in
         h)
             host=$OPTARG
@@ -137,6 +138,9 @@ while getopts 'h:u:p:P:' arg; do
         P)
             port=$OPTARG
             ;;
+        c)
+            keep_count=$OPTARG
+            ;;
         ?)
             # OPTARG
             usage
@@ -148,7 +152,9 @@ shift $(($OPTIND - 1))
 
 [ $# -lt 1 ] && usage
 [ $# -ge 1 ] && target_dir=$1
-[ $# -ge 2 ] && keep_count=$2
+shift 1
+
+databases=$@
 
 [ -n "`echo $keep_count|sed 's/[0-9]//g'`" ] && { error "keep_count $keep_count is non-numeric"; exit 1; }
 [ $keep_count -lt 1 ] && keep_count=1
@@ -160,7 +166,6 @@ shift $(($OPTIND - 1))
 cmdcheck mysql
 cmdcheck mysqldump
 cmdcheck gzip
-
 
 if [ ! -d $target_dir ];then 
     info "create target directory ..."
@@ -174,7 +179,19 @@ MYSQL="mysql -P ${port} -h ${host} -u${user}"
 MYSQLDUMP="mysqldump -P ${port} -h ${host} -u${user}"
 current_date=`date "+%Y%m%d"`
 
-databases=`$MYSQL -e 'show databases;'|sed '1d'|sed '/information_schema/d'|sed '/performance_schema/d'`
+info "collect databases ..."
+real_databases=`$MYSQL -e 'show databases;'|sed '1d'|sed '/^information_schema$/d'|sed '/^performance_schema$/d'|sed '/^mysql$/d'`
+if [ -z "$databases" ];then
+    databases=$real_databases
+else
+    for database in $databases
+    do
+        if [ -z "`echo $real_databases|grep $database`" ];then
+            error "the database $database does not exist."
+            exit 1
+        fi
+    done
+fi
 
 sql_files=
 
