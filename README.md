@@ -9,7 +9,7 @@ DESCRIPTION:
 
 mysqlbackup -  the MySQL backup tool
 
-target_dir is the directory that backup data location. keep_count is the number copies keep, the minimum is 1, default is 3.
+target_dir is the directory that backup data location. keep_count is the number copies to keep, the minimum is 1, default is 3.
 
 OPTIONS:
     -h  host name, default is localhost.
@@ -28,6 +28,7 @@ EXAMPLES:
 curl https://raw.githubusercontent.com/smallmuou/mysqlbackup/master/mysqlbackup >/usr/local/bin
 chmod +x /usr/local/bin/mysqlbackup
 ```
+You need add /usr/local/bin to environment variable PATH
 
 ## BACKUP
 
