@@ -24,3 +24,15 @@ EXAMPLES:
 
 ## INSTALL
 
+```
+curl https://raw.githubusercontent.com/smallmuou/mysqlbackup/master/mysqlbackup >/usr/local/bin
+chmod +x /usr/local/bin/mysqlbackup
+```
+
+## BACKUP
+
+Backup 192.168.1.100 mysql to /srv/backups, and keep latest 3 copies.
+
+```bash
+mysqlbackup -h 192.168.1.100 -P 3306 -u root -p test /srv/backups 3
+```
