@@ -17,7 +17,7 @@ OPTIONS:
     -u  user,  default is root.
     -p  password, default is empty.
     -P  port, default is 3306.
-    -c  the count of latest copies to keep,  the minimum is 1, default is 3.
+    -c  the count of copies to keep,  the minimum is 1, default is 3.
 
 EXAMPLES:
     mysqlbackup -u root -p test /srv/backups mydb
